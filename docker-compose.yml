@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+  web:
+    build: .
+    command: bundle exec rails s -p 3000 -b 0.0.0.0
+    volumes:
+      - .:/rails_docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+#標準入出力とエラー出力をコンテナに結びつける設定
+    stdin_open: true
+#疑似端末（キーボードによる入力）をコンテナに結びつける設定
+    tty: true
+    #command: dockerize -wait tcp://db:3306 -timeout 20s bundle exec unicorn -c config/unicorn.rb
+volumes:
+  mysql-data:
+    driver: local
